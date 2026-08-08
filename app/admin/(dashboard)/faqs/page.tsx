@@ -7,11 +7,20 @@ import { deleteFAQ, toggleFAQActive } from "@/lib/actions/faqs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
+import { parsePage, getPagination } from "@/lib/pagination";
+import { PaginationControls } from "@/components/admin/pagination-controls";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminFAQsPage() {
-  const faqs = await prisma.fAQ.findMany({ orderBy: { order: "asc" } });
+export default async function AdminFAQsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const totalItems = await prisma.fAQ.count();
+  const { skip, take, currentPage, totalPages } = getPagination(parsePage(pageParam), totalItems);
+  const faqs = await prisma.fAQ.findMany({ orderBy: { order: "asc" }, skip, take });
 
   return (
     <div>
@@ -58,6 +67,13 @@ export default async function AdminFAQsPage() {
           </TableBody>
         </Table>
       </div>
+      <PaginationControls
+        basePath="/admin/faqs"
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        pageSize={take}
+      />
     </div>
   );
 }

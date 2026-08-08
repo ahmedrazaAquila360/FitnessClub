@@ -9,12 +9,9 @@ import { DAY_LABELS, DIFFICULTY_LABELS } from "@/lib/constants";
 import { Reveal } from "@/components/animations/reveal";
 import { ProgramCard } from "@/components/programs/program-card";
 
-export const revalidate = 300;
-
-export async function generateStaticParams() {
-  const programs = await getPrograms();
-  return programs.map((p) => ({ slug: p.slug }));
-}
+// Rendered fully per-request (not ISR) so a missing slug's notFound() call
+// reliably commits a real 404 status instead of an optimistic static shell.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,

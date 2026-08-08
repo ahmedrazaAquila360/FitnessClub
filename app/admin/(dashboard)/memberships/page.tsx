@@ -9,11 +9,20 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { Copy, Pencil } from "lucide-react";
+import { parsePage, getPagination } from "@/lib/pagination";
+import { PaginationControls } from "@/components/admin/pagination-controls";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminMembershipsPage() {
-  const plans = await prisma.membershipPlan.findMany({ orderBy: { order: "asc" } });
+export default async function AdminMembershipsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const totalItems = await prisma.membershipPlan.count();
+  const { skip, take, currentPage, totalPages } = getPagination(parsePage(pageParam), totalItems);
+  const plans = await prisma.membershipPlan.findMany({ orderBy: { order: "asc" }, skip, take });
 
   return (
     <div>
@@ -71,6 +80,13 @@ export default async function AdminMembershipsPage() {
           </TableBody>
         </Table>
       </div>
+      <PaginationControls
+        basePath="/admin/memberships"
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        pageSize={take}
+      />
     </div>
   );
 }

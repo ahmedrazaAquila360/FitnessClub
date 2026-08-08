@@ -9,13 +9,24 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Copy, Pencil } from "lucide-react";
+import { parsePage, getPagination } from "@/lib/pagination";
+import { PaginationControls } from "@/components/admin/pagination-controls";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminProgramsPage() {
+export default async function AdminProgramsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const totalItems = await prisma.program.count();
+  const { skip, take, currentPage, totalPages } = getPagination(parsePage(pageParam), totalItems);
   const programs = await prisma.program.findMany({
     orderBy: { order: "asc" },
     include: { trainer: { select: { name: true } } },
+    skip,
+    take,
   });
 
   return (
@@ -88,6 +99,13 @@ export default async function AdminProgramsPage() {
           </TableBody>
         </Table>
       </div>
+      <PaginationControls
+        basePath="/admin/programs"
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        pageSize={take}
+      />
     </div>
   );
 }

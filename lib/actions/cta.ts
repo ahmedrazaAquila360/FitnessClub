@@ -6,6 +6,7 @@ import { logActivity } from "@/lib/actions/activity";
 import type { ActionResult } from "@/lib/actions/types";
 import { revalidatePath } from "next/cache";
 import { SINGLETON_ID } from "@/lib/constants";
+import { requiredImageUrl } from "@/lib/validations/shared";
 import { z } from "zod";
 
 const ctaSchema = z.object({
@@ -16,7 +17,7 @@ const ctaSchema = z.object({
   primaryCtaHref: z.string().min(1),
   secondaryCtaLabel: z.string().min(1),
   secondaryCtaHref: z.string().min(1),
-  backgroundImage: z.string().url(),
+  backgroundImage: requiredImageUrl,
   isActive: z.coerce.boolean().default(true),
 });
 

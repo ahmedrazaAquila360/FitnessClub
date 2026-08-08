@@ -8,11 +8,20 @@ import { deleteFacility, toggleFacilityActive } from "@/lib/actions/facilities";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
+import { parsePage, getPagination } from "@/lib/pagination";
+import { PaginationControls } from "@/components/admin/pagination-controls";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminFacilitiesPage() {
-  const facilities = await prisma.facility.findMany({ orderBy: { order: "asc" } });
+export default async function AdminFacilitiesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const totalItems = await prisma.facility.count();
+  const { skip, take, currentPage, totalPages } = getPagination(parsePage(pageParam), totalItems);
+  const facilities = await prisma.facility.findMany({ orderBy: { order: "asc" }, skip, take });
 
   return (
     <div>
@@ -67,6 +76,13 @@ export default async function AdminFacilitiesPage() {
           </TableBody>
         </Table>
       </div>
+      <PaginationControls
+        basePath="/admin/facilities"
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        pageSize={take}
+      />
     </div>
   );
 }

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { FONT_VARIABLES } from "@/lib/fonts";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import ThemeStyleInjector from "@/components/layout/theme-style-injector";
+import { NavigationProgress } from "@/components/layout/navigation-progress";
 import { getSEOSettings, getGymSettings } from "@/lib/data/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -42,6 +44,9 @@ export default function RootLayout({
     <html lang="en" className={`${FONT_VARIABLES} antialiased`} data-scroll-behavior="smooth">
       <body className="min-h-screen bg-background text-foreground flex flex-col">
         <ThemeStyleInjector />
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         <TooltipProvider delay={150}>{children}</TooltipProvider>
         <Toaster theme="dark" position="bottom-right" richColors />
       </body>

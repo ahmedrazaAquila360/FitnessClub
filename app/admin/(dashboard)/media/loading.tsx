@@ -1,0 +1,5 @@
+import { AdminGridSkeleton } from "@/components/admin/admin-skeletons";
+
+export default function Loading() {
+  return <AdminGridSkeleton items={15} />;
+}

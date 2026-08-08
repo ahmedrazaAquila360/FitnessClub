@@ -14,6 +14,8 @@ const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"
 export function BrandingForm({ gym }: { gym: GymSettings }) {
   const [state, formAction] = useActionState(updateGymSettings, {});
   const [logoUrl, setLogoUrl] = useState(gym.logoUrl ?? "");
+  const [logoDarkUrl, setLogoDarkUrl] = useState(gym.logoDarkUrl ?? "");
+  const [logoLightUrl, setLogoLightUrl] = useState(gym.logoLightUrl ?? "");
   const [faviconUrl, setFaviconUrl] = useState(gym.faviconUrl ?? "");
   const hours = gym.openingHours as Record<string, string>;
 
@@ -42,8 +44,24 @@ export function BrandingForm({ gym }: { gym: GymSettings }) {
           <ImagePicker label="Logo" name="logoUrl" value={logoUrl} onChange={setLogoUrl} folder="branding" required={false} />
           <ImagePicker label="Favicon" name="faviconUrl" value={faviconUrl} onChange={setFaviconUrl} folder="branding" required={false} />
         </div>
-        <input type="hidden" name="logoDarkUrl" value={gym.logoDarkUrl ?? ""} />
-        <input type="hidden" name="logoLightUrl" value={gym.logoLightUrl ?? ""} />
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <ImagePicker
+            label="Dark Logo (for light backgrounds)"
+            name="logoDarkUrl"
+            value={logoDarkUrl}
+            onChange={setLogoDarkUrl}
+            folder="branding"
+            required={false}
+          />
+          <ImagePicker
+            label="Light Logo (for dark backgrounds)"
+            name="logoLightUrl"
+            value={logoLightUrl}
+            onChange={setLogoLightUrl}
+            folder="branding"
+            required={false}
+          />
+        </div>
       </section>
 
       <section className="space-y-5">

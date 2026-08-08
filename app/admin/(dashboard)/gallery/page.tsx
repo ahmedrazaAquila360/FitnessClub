@@ -6,11 +6,22 @@ import { ConfirmDeleteButton } from "@/components/admin/confirm-delete-button";
 import { deleteGalleryItem } from "@/lib/actions/gallery";
 import { GALLERY_CATEGORY_LABELS } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
+import { parsePage, getPagination } from "@/lib/pagination";
+import { PaginationControls } from "@/components/admin/pagination-controls";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminGalleryPage() {
-  const items = await prisma.galleryItem.findMany({ orderBy: { order: "asc" } });
+const PAGE_SIZE = 20;
+
+export default async function AdminGalleryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const totalItems = await prisma.galleryItem.count();
+  const { skip, take, currentPage, totalPages } = getPagination(parsePage(pageParam), totalItems, PAGE_SIZE);
+  const items = await prisma.galleryItem.findMany({ orderBy: { order: "asc" }, skip, take });
 
   return (
     <div>
@@ -51,6 +62,13 @@ export default async function AdminGalleryPage() {
           ))}
         </div>
       )}
+      <PaginationControls
+        basePath="/admin/gallery"
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        pageSize={take}
+      />
     </div>
   );
 }

@@ -8,13 +8,24 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { DAY_LABELS } from "@/lib/constants";
 import { Pencil } from "lucide-react";
+import { parsePage, getPagination } from "@/lib/pagination";
+import { PaginationControls } from "@/components/admin/pagination-controls";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminSchedulePage() {
+export default async function AdminSchedulePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const totalItems = await prisma.classSchedule.count();
+  const { skip, take, currentPage, totalPages } = getPagination(parsePage(pageParam), totalItems);
   const classes = await prisma.classSchedule.findMany({
     orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
     include: { trainer: { select: { name: true } }, program: { select: { name: true } } },
+    skip,
+    take,
   });
 
   return (
@@ -74,6 +85,13 @@ export default async function AdminSchedulePage() {
           </TableBody>
         </Table>
       </div>
+      <PaginationControls
+        basePath="/admin/schedule"
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        pageSize={take}
+      />
     </div>
   );
 }

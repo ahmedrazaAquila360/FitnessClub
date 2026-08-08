@@ -6,15 +6,18 @@ import { logActivity } from "@/lib/actions/activity";
 import type { ActionResult } from "@/lib/actions/types";
 import { revalidatePath } from "next/cache";
 import { SINGLETON_ID } from "@/lib/constants";
+import { requiredImageUrl } from "@/lib/validations/shared";
 import { z } from "zod";
+
+const optionalImageField = requiredImageUrl.or(z.literal(""));
 
 const gymSchema = z.object({
   brandName: z.string().min(1),
   tagline: z.string().min(1),
-  logoUrl: z.string().url().optional().nullable().or(z.literal("")),
-  logoDarkUrl: z.string().url().optional().nullable().or(z.literal("")),
-  logoLightUrl: z.string().url().optional().nullable().or(z.literal("")),
-  faviconUrl: z.string().url().optional().nullable().or(z.literal("")),
+  logoUrl: optionalImageField,
+  logoDarkUrl: optionalImageField,
+  logoLightUrl: optionalImageField,
+  faviconUrl: optionalImageField,
   phone: z.string().min(1),
   whatsapp: z.string().min(1),
   email: z.string().email(),
@@ -96,7 +99,7 @@ const seoSchema = z.object({
   defaultTitle: z.string().min(1),
   titleTemplate: z.string().min(1),
   defaultDescription: z.string().min(1),
-  ogImage: z.string().url().optional().nullable().or(z.literal("")),
+  ogImage: optionalImageField,
   canonicalUrl: z.string().url(),
   keywords: z.string().min(1),
   robotsIndex: z.coerce.boolean(),

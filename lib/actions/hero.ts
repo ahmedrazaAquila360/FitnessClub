@@ -6,6 +6,7 @@ import { logActivity } from "@/lib/actions/activity";
 import type { ActionResult } from "@/lib/actions/types";
 import { revalidatePath } from "next/cache";
 import { SINGLETON_ID } from "@/lib/constants";
+import { requiredImageUrl } from "@/lib/validations/shared";
 import { z } from "zod";
 
 const heroSchema = z.object({
@@ -18,7 +19,7 @@ const heroSchema = z.object({
   primaryCtaHref: z.string().min(1),
   secondaryCtaLabel: z.string().min(1),
   secondaryCtaHref: z.string().min(1),
-  backgroundImage: z.string().url(),
+  backgroundImage: requiredImageUrl,
   backgroundVideo: z.string().url().optional().nullable().or(z.literal("")),
   overlayOpacity: z.coerce.number().min(0).max(1),
   textAlign: z.enum(["LEFT", "CENTER", "RIGHT"]),

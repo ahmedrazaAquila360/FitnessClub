@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Award, ArrowRight, CalendarDays } from "lucide-react";
-import { getTrainerBySlug, getTrainers } from "@/lib/data/content";
+import { getTrainerBySlug } from "@/lib/data/content";
 import { DAY_LABELS } from "@/lib/constants";
 import { Reveal } from "@/components/animations/reveal";
 import {
@@ -13,12 +13,9 @@ import {
   YoutubeIcon,
 } from "@/components/icons/social-icons";
 
-export const revalidate = 300;
-
-export async function generateStaticParams() {
-  const trainers = await getTrainers();
-  return trainers.map((t) => ({ slug: t.slug }));
-}
+// Rendered fully per-request (not ISR) so a missing slug's notFound() call
+// reliably commits a real 404 status instead of an optimistic static shell.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,

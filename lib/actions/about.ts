@@ -6,6 +6,7 @@ import { logActivity } from "@/lib/actions/activity";
 import type { ActionResult } from "@/lib/actions/types";
 import { revalidatePath } from "next/cache";
 import { SINGLETON_ID } from "@/lib/constants";
+import { requiredImageUrl } from "@/lib/validations/shared";
 import { z } from "zod";
 
 const valueItemSchema = z.object({
@@ -17,8 +18,8 @@ const aboutSchema = z.object({
   eyebrow: z.string().min(1),
   heading: z.string().min(1),
   description: z.string().min(1),
-  image: z.string().url(),
-  secondaryImage: z.string().url(),
+  image: requiredImageUrl,
+  secondaryImage: requiredImageUrl,
   missionTitle: z.string().min(1),
   missionText: z.string().min(1),
   values: z.array(valueItemSchema).default([]),

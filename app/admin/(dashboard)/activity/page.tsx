@@ -2,8 +2,12 @@ import { formatDistanceToNow } from "date-fns";
 import { prisma } from "@/lib/prisma";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { Badge } from "@/components/ui/badge";
+import { parsePage, getPagination } from "@/lib/pagination";
+import { PaginationControls } from "@/components/admin/pagination-controls";
 
 export const dynamic = "force-dynamic";
+
+const PAGE_SIZE = 20;
 
 const ACTION_COLORS: Record<string, string> = {
   CREATE: "bg-emerald-500/15 text-emerald-400",
@@ -19,10 +23,18 @@ const ACTION_COLORS: Record<string, string> = {
   DISABLE: "bg-white/10 text-foreground/60",
 };
 
-export default async function AdminActivityPage() {
+export default async function AdminActivityPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const totalItems = await prisma.activityLog.count();
+  const { skip, take, currentPage, totalPages } = getPagination(parsePage(pageParam), totalItems, PAGE_SIZE);
   const logs = await prisma.activityLog.findMany({
     orderBy: { createdAt: "desc" },
-    take: 100,
+    skip,
+    take,
     include: { user: { select: { name: true } } },
   });
 
@@ -51,6 +63,13 @@ export default async function AdminActivityPage() {
           ))}
         </div>
       )}
+      <PaginationControls
+        basePath="/admin/activity"
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        pageSize={take}
+      />
     </div>
   );
 }

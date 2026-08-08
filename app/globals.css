@@ -274,6 +274,21 @@
     background-position: 100% 50%;
   }
 }
+@keyframes nav-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(50%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+.animate-nav-progress {
+  animation: nav-progress 1s ease-in-out infinite;
+}
+
 @keyframes grain {
   0% {
     transform: translate(0, 0);

@@ -4,12 +4,23 @@ import { requireRole, MANAGE_USERS_ROLES } from "@/lib/auth/guards";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { InviteUserForm } from "@/components/admin/users/invite-user-form";
 import { UserRowActions } from "@/components/admin/users/user-row-actions";
+import { parsePage, getPagination } from "@/lib/pagination";
+import { PaginationControls } from "@/components/admin/pagination-controls";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminUsersPage() {
+const PAGE_SIZE = 20;
+
+export default async function AdminUsersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const session = await requireRole(MANAGE_USERS_ROLES);
-  const users = await prisma.user.findMany({ orderBy: { createdAt: "asc" } });
+  const { page: pageParam } = await searchParams;
+  const totalItems = await prisma.user.count();
+  const { skip, take, currentPage, totalPages } = getPagination(parsePage(pageParam), totalItems, PAGE_SIZE);
+  const users = await prisma.user.findMany({ orderBy: { createdAt: "asc" }, skip, take });
 
   return (
     <div>
@@ -55,6 +66,13 @@ export default async function AdminUsersPage() {
           </TableBody>
         </Table>
       </div>
+      <PaginationControls
+        basePath="/admin/users"
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        pageSize={take}
+      />
     </div>
   );
 }

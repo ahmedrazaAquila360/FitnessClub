@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { requiredImageUrl as requiredImage, optionalImageUrl as optionalImage } from "@/lib/validations/shared";
 
 const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -7,7 +8,7 @@ export const programSchema = z.object({
   slug: z.string().regex(slugRegex, "Use lowercase letters, numbers and hyphens only"),
   description: z.string().min(10, "Description is required"),
   shortDescription: z.string().min(5, "Short description is required"),
-  image: z.string().url("A valid image URL is required"),
+  image: requiredImage,
   icon: z.string().min(1),
   category: z.string().min(1),
   duration: z.string().min(1),
@@ -37,7 +38,7 @@ export const membershipPlanSchema = z.object({
 export const trainerSchema = z.object({
   name: z.string().min(2),
   slug: z.string().regex(slugRegex),
-  image: z.string().url(),
+  image: requiredImage,
   position: z.string().min(2),
   specialization: z.array(z.string().min(1)).default([]),
   bio: z.string().min(10),
@@ -77,7 +78,7 @@ export const classScheduleSchema = z.object({
 export const facilitySchema = z.object({
   name: z.string().min(2),
   description: z.string().min(5),
-  image: z.string().url(),
+  image: requiredImage,
   icon: z.string().min(1),
   isFeatured: z.coerce.boolean().default(false),
   order: z.coerce.number().int().default(0),
@@ -86,8 +87,8 @@ export const facilitySchema = z.object({
 
 export const transformationSchema = z.object({
   memberName: z.string().min(2),
-  beforeImage: z.string().url(),
-  afterImage: z.string().url(),
+  beforeImage: requiredImage,
+  afterImage: requiredImage,
   duration: z.string().min(1),
   goal: z.string().min(2),
   story: z.string().min(10),
@@ -99,7 +100,7 @@ export const transformationSchema = z.object({
 
 export const testimonialSchema = z.object({
   name: z.string().min(2),
-  image: z.string().url().optional().nullable(),
+  image: optionalImage,
   rating: z.coerce.number().int().min(1).max(5),
   content: z.string().min(10),
   membership: z.string().min(2),
@@ -109,7 +110,7 @@ export const testimonialSchema = z.object({
 });
 
 export const galleryItemSchema = z.object({
-  image: z.string().url(),
+  image: requiredImage,
   category: z.enum([
     "GYM",
     "EQUIPMENT",
@@ -138,7 +139,7 @@ export const whyChooseUsSchema = z.object({
   title: z.string().min(2),
   description: z.string().min(5),
   icon: z.string().min(1),
-  image: z.string().url().optional().nullable(),
+  image: optionalImage,
   order: z.coerce.number().int().default(0),
   isActive: z.coerce.boolean().default(true),
 });
