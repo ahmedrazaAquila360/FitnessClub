@@ -1,0 +1,570 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================================================
+// ENUMS
+// ==========================================================================
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  ALL_LEVELS
+}
+
+enum BillingPeriod {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum GalleryCategory {
+  GYM
+  EQUIPMENT
+  TRAINING
+  CLASSES
+  TRAINERS
+  EVENTS
+  LIFESTYLE
+}
+
+enum SocialPlatform {
+  INSTAGRAM
+  FACEBOOK
+  TWITTER
+  YOUTUBE
+  TIKTOK
+  LINKEDIN
+  WHATSAPP
+}
+
+enum NavLocation {
+  HEADER
+  FOOTER
+}
+
+enum ButtonStyle {
+  ROUNDED
+  PILL
+  SQUARE
+}
+
+enum TextAlign {
+  LEFT
+  CENTER
+  RIGHT
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+enum AnimationType {
+  FADE_UP
+  FADE_IN
+  ZOOM_IN
+  SLIDE_LEFT
+}
+
+// ==========================================================================
+// AUTH / USERS
+// ==========================================================================
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(EDITOR)
+  avatar       String?
+  isActive     Boolean  @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  activityLogs ActivityLog[]
+
+  @@index([email])
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action      String
+  entityType  String
+  entityId    String?
+  description String
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entityType])
+}
+
+// ==========================================================================
+// GLOBAL SITE SETTINGS (singletons keyed by fixed id "main")
+// ==========================================================================
+
+model GymSettings {
+  id               String   @id @default("main")
+  brandName        String   @default("APEX ATHLETIC")
+  tagline          String   @default("Premium Performance Training")
+  logoUrl          String?
+  logoDarkUrl      String?
+  logoLightUrl     String?
+  faviconUrl       String?
+  phone            String   @default("+1 (555) 010-2040")
+  whatsapp         String   @default("+15550102040")
+  email            String   @default("hello@apexathletic.com")
+  address          String   @default("2400 Iron Horse Boulevard")
+  city             String   @default("Austin")
+  state            String   @default("TX")
+  zip              String   @default("78701")
+  country          String   @default("United States")
+  latitude         Float    @default(30.2672)
+  longitude        Float    @default(-97.7431)
+  googleMapsEmbed  String?
+  openingHours     Json     @default("{\"monday\":\"5:00 AM - 11:00 PM\",\"tuesday\":\"5:00 AM - 11:00 PM\",\"wednesday\":\"5:00 AM - 11:00 PM\",\"thursday\":\"5:00 AM - 11:00 PM\",\"friday\":\"5:00 AM - 11:00 PM\",\"saturday\":\"6:00 AM - 9:00 PM\",\"sunday\":\"7:00 AM - 8:00 PM\"}")
+  updatedAt        DateTime @updatedAt
+}
+
+model ThemeSettings {
+  id             String      @id @default("main")
+  primaryColor   String      @default("#d4ff3f")
+  secondaryColor String      @default("#1a1a1a")
+  accentColor    String      @default("#39ff8f")
+  backgroundColor String     @default("#0a0a0a")
+  foregroundColor String     @default("#f5f5f0")
+  mutedColor     String      @default("#8a8a8a")
+  buttonStyle    ButtonStyle @default(PILL)
+  borderRadius   String      @default("0.75rem")
+  fontHeading    String      @default("Anton")
+  fontBody       String      @default("Inter")
+  updatedAt      DateTime    @updatedAt
+}
+
+model SEOSettings {
+  id                String   @id @default("main")
+  defaultTitle      String   @default("Apex Athletic | Premium Performance Training Gym")
+  titleTemplate     String   @default("%s | Apex Athletic")
+  defaultDescription String  @default("Apex Athletic is a premium strength, conditioning and performance training club. Elite trainers, world-class facilities, real transformations.")
+  ogImage           String?
+  canonicalUrl      String   @default("https://apexathletic.com")
+  keywords          String   @default("gym, fitness club, personal training, strength training, HIIT, boxing gym, premium gym")
+  robotsIndex       Boolean  @default(true)
+  robotsFollow      Boolean  @default(true)
+  structuredDataType String  @default("HealthClub")
+  updatedAt         DateTime @updatedAt
+}
+
+model FooterSettings {
+  id                 String   @id @default("main")
+  description        String   @default("Apex Athletic is where dedicated athletes and everyday people come to build strength, discipline and unstoppable momentum.")
+  copyrightText      String   @default("Apex Athletic. All rights reserved.")
+  newsletterEnabled  Boolean  @default(true)
+  newsletterHeading  String   @default("Get exclusive training tips & offers")
+  updatedAt          DateTime @updatedAt
+}
+
+model NavigationItem {
+  id        String      @id @default(cuid())
+  label     String
+  href      String
+  location  NavLocation @default(HEADER)
+  order     Int         @default(0)
+  isExternal Boolean    @default(false)
+  isActive  Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([location, order])
+}
+
+model SocialLink {
+  id        String         @id @default(cuid())
+  platform  SocialPlatform
+  url       String
+  order     Int            @default(0)
+  isActive  Boolean        @default(true)
+
+  @@index([order])
+}
+
+// ==========================================================================
+// HOMEPAGE SECTION MANAGER
+// ==========================================================================
+
+model PageSection {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  name      String
+  isEnabled Boolean  @default(true)
+  order     Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@index([order])
+}
+
+// ==========================================================================
+// HERO
+// ==========================================================================
+
+model HeroSection {
+  id               String        @id @default("main")
+  badge            String        @default("Austin's #1 Rated Performance Gym")
+  heading          String        @default("BUILD YOUR")
+  headingHighlight String        @default("STRONGEST SELF")
+  subtitle         String?       @default("")
+  description      String        @default("Elite coaching, world-class facilities and a community obsessed with results. This is where ordinary limits end.")
+  primaryCtaLabel  String        @default("Join Now")
+  primaryCtaHref   String        @default("/membership")
+  secondaryCtaLabel String       @default("Book a Tour")
+  secondaryCtaHref String        @default("/contact")
+  backgroundImage  String        @default("https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2400&auto=format&fit=crop")
+  backgroundVideo  String?
+  overlayOpacity   Float         @default(0.6)
+  textAlign        TextAlign     @default(LEFT)
+  animationType    AnimationType @default(FADE_UP)
+  isActive         Boolean       @default(true)
+  updatedAt        DateTime      @updatedAt
+}
+
+// ==========================================================================
+// ABOUT + STATS
+// ==========================================================================
+
+model AboutSection {
+  id           String   @id @default("main")
+  eyebrow      String   @default("Our Story")
+  heading      String   @default("WE BUILD MORE THAN BODIES")
+  description  String   @default("Founded by athletes for athletes, Apex Athletic was built on a simple belief: discipline, expert coaching and community turn ordinary people into their strongest selves. Every program, every class, every square foot of this facility is engineered around real results.")
+  image        String   @default("https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=1800&auto=format&fit=crop")
+  secondaryImage String @default("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1200&auto=format&fit=crop")
+  missionTitle String   @default("Our Mission")
+  missionText  String   @default("To deliver premium, science-backed training experiences that transform bodies, sharpen minds and build a community that pushes each other further than they'd ever go alone.")
+  values       Json     @default("[{\"title\":\"Discipline\",\"description\":\"Consistency beats intensity. We build habits that last.\"},{\"title\":\"Community\",\"description\":\"You never train alone. Our members push each other daily.\"},{\"title\":\"Results\",\"description\":\"Every program is measured, tracked and optimized for outcomes.\"}]")
+  isActive     Boolean  @default(true)
+  updatedAt    DateTime @updatedAt
+}
+
+model Statistic {
+  id       String  @id @default(cuid())
+  label    String
+  value    Int
+  suffix   String  @default("")
+  icon     String  @default("Users")
+  order    Int     @default(0)
+  isActive Boolean @default(true)
+
+  @@index([order])
+}
+
+// ==========================================================================
+// PROGRAMS
+// ==========================================================================
+
+model Program {
+  id               String     @id @default(cuid())
+  name             String
+  slug             String     @unique
+  description      String
+  shortDescription String
+  image            String
+  icon             String     @default("Dumbbell")
+  category         String     @default("Strength")
+  duration         String     @default("60 min")
+  difficulty       Difficulty @default(ALL_LEVELS)
+  trainerId        String?
+  trainer          Trainer?   @relation(fields: [trainerId], references: [id], onDelete: SetNull)
+  ctaLabel         String     @default("Explore Program")
+  ctaHref          String?
+  isFeatured       Boolean    @default(false)
+  order            Int        @default(0)
+  isActive         Boolean    @default(true)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  classes          ClassSchedule[]
+
+  @@index([slug])
+  @@index([isActive, order])
+}
+
+// ==========================================================================
+// MEMBERSHIP PLANS
+// ==========================================================================
+
+model MembershipPlan {
+  id            String        @id @default(cuid())
+  name          String
+  price         Decimal       @db.Decimal(10, 2)
+  billingPeriod BillingPeriod @default(MONTHLY)
+  description   String
+  features      String[]
+  ctaLabel      String        @default("Join Now")
+  ctaHref       String        @default("/contact")
+  badge         String?
+  isFeatured    Boolean       @default(false)
+  order         Int           @default(0)
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([isActive, order])
+}
+
+// ==========================================================================
+// TRAINERS
+// ==========================================================================
+
+model Trainer {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  image           String
+  position        String
+  specialization  String[]
+  bio             String
+  experienceYears Int      @default(1)
+  certifications  String[]
+  instagram       String?
+  facebook        String?
+  twitter         String?
+  youtube         String?
+  isFeatured      Boolean  @default(false)
+  order           Int      @default(0)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  programs        Program[]
+  classes         ClassSchedule[]
+
+  @@index([slug])
+  @@index([isActive, order])
+}
+
+// ==========================================================================
+// CLASS SCHEDULE
+// ==========================================================================
+
+model ClassSchedule {
+  id         String     @id @default(cuid())
+  className  String
+  programId  String?
+  program    Program?   @relation(fields: [programId], references: [id], onDelete: SetNull)
+  trainerId  String
+  trainer    Trainer    @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  dayOfWeek  DayOfWeek
+  startTime  String
+  endTime    String
+  room       String     @default("Main Floor")
+  difficulty Difficulty @default(ALL_LEVELS)
+  capacity   Int        @default(20)
+  booked     Int        @default(0)
+  isActive   Boolean    @default(true)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@index([dayOfWeek])
+  @@index([isActive])
+}
+
+// ==========================================================================
+// FACILITIES
+// ==========================================================================
+
+model Facility {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  image       String
+  icon        String   @default("Building2")
+  isFeatured  Boolean  @default(false)
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive, order])
+}
+
+// ==========================================================================
+// TRANSFORMATIONS
+// ==========================================================================
+
+model Transformation {
+  id           String   @id @default(cuid())
+  memberName   String
+  beforeImage  String
+  afterImage   String
+  duration     String
+  goal         String
+  story        String
+  result       String
+  isFeatured   Boolean  @default(false)
+  order        Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isActive, order])
+}
+
+// ==========================================================================
+// TESTIMONIALS
+// ==========================================================================
+
+model Testimonial {
+  id         String   @id @default(cuid())
+  name       String
+  image      String?
+  rating     Int      @default(5)
+  content    String
+  membership String   @default("Member")
+  date       DateTime @default(now())
+  isFeatured Boolean  @default(false)
+  order      Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  @@index([isActive, order])
+}
+
+// ==========================================================================
+// GALLERY
+// ==========================================================================
+
+model GalleryItem {
+  id         String          @id @default(cuid())
+  image      String
+  category   GalleryCategory @default(GYM)
+  caption    String?
+  altText    String          @default("")
+  isFeatured Boolean         @default(false)
+  order      Int             @default(0)
+  isActive   Boolean         @default(true)
+  createdAt  DateTime        @default(now())
+
+  @@index([category])
+  @@index([isActive, order])
+}
+
+// ==========================================================================
+// FAQ
+// ==========================================================================
+
+model FAQ {
+  id       String  @id @default(cuid())
+  question String
+  answer   String
+  category String  @default("General")
+  order    Int     @default(0)
+  isActive Boolean @default(true)
+
+  @@index([isActive, order])
+}
+
+// ==========================================================================
+// WHY CHOOSE US
+// ==========================================================================
+
+model WhyChooseUsItem {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  icon        String   @default("Trophy")
+  image       String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+
+  @@index([isActive, order])
+}
+
+// ==========================================================================
+// CTA SECTION
+// ==========================================================================
+
+model CTASection {
+  id                 String   @id @default("main")
+  heading            String   @default("YOUR NEXT LEVEL")
+  headingHighlight   String   @default("STARTS TODAY")
+  description        String   @default("No contracts. No excuses. Just a free tour, a real training plan, and a team that will not let you settle for average.")
+  primaryCtaLabel    String   @default("Join Now")
+  primaryCtaHref     String   @default("/membership")
+  secondaryCtaLabel  String   @default("Book a Tour")
+  secondaryCtaHref   String   @default("/contact")
+  backgroundImage    String   @default("https://images.unsplash.com/photo-1517963879433-6ad2b056d712?q=80&w=2400&auto=format&fit=crop")
+  isActive           Boolean  @default(true)
+  updatedAt          DateTime @updatedAt
+}
+
+// ==========================================================================
+// CONTACT
+// ==========================================================================
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+// ==========================================================================
+// NEWSLETTER
+// ==========================================================================
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+// ==========================================================================
+// MEDIA LIBRARY
+// ==========================================================================
+
+model MediaAsset {
+  id        String    @id @default(cuid())
+  url       String
+  type      MediaType @default(IMAGE)
+  altText   String    @default("")
+  caption   String?
+  folder    String    @default("general")
+  width     Int?
+  height    Int?
+  size      Int?
+  createdAt DateTime  @default(now())
+
+  @@index([folder])
+  @@index([type])
+}
