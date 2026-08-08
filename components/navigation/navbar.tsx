@@ -146,17 +146,17 @@ export function Navbar({
             transition={{ duration: 0.3 }}
             className="fixed inset-0 z-[60] flex flex-col bg-background lg:hidden"
           >
-            <div className="flex items-center justify-between px-6 py-6">
-              <span className="heading-font text-lg tracking-wide">{brandName}</span>
+            <div className="flex shrink-0 items-center justify-between px-5 py-4 sm:px-6 sm:py-6">
+              <span className="heading-font text-base tracking-wide sm:text-lg">{brandName}</span>
               <button
                 aria-label="Close menu"
                 onClick={() => setMobileOpen(false)}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 sm:h-10 sm:w-10"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
             </div>
-            <nav className="flex flex-1 flex-col items-start justify-center gap-2 px-8">
+            <nav className="flex flex-1 flex-col items-start justify-center gap-0.5 overflow-y-auto px-6 py-4 sm:gap-1 sm:px-8">
               {navItems.map((item, i) => (
                 <motion.div
                   key={item.id}
@@ -166,7 +166,7 @@ export function Navbar({
                 >
                   <Link
                     href={item.href}
-                    className="heading-font block py-3 text-4xl tracking-wide text-foreground/90 transition-colors hover:text-brand"
+                    className="heading-font block py-1.5 text-3xl tracking-wide text-foreground/90 transition-colors hover:text-brand sm:py-3 sm:text-4xl md:text-5xl"
                   >
                     {item.label}
                   </Link>
@@ -176,13 +176,13 @@ export function Navbar({
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.06 * navItems.length + 0.15, duration: 0.5 }}
-                className="mt-8"
+                className="mt-6 sm:mt-8"
               >
                 <Button
                   render={<Link href={ctaHref} />}
                   nativeButton={false}
                   size="lg"
-                  className="rounded-full bg-brand px-8 font-bold uppercase text-black hover:bg-brand/90"
+                  className="rounded-full bg-brand px-6 font-bold uppercase text-black hover:bg-brand/90 sm:px-8"
                 >
                   {ctaLabel}
                 </Button>

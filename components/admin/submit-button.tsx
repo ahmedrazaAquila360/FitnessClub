@@ -23,7 +23,7 @@ export function SubmitButton({
       type="submit"
       disabled={pending}
       variant={variant}
-      className={cn("rounded-full font-bold uppercase tracking-wider", className)}
+      className={cn("rounded-full font-semibold", className)}
     >
       {pending ? pendingLabel : children}
     </Button>

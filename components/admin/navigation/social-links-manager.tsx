@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash2, Plus } from "lucide-react";
 import { createSocialLink, updateSocialLink, deleteSocialLink } from "@/lib/actions/social";
 import type { SocialLink } from "@prisma/client";
@@ -20,17 +21,18 @@ export function SocialLinksManager({ links }: { links: SocialLink[] }) {
         >
           <div className="space-y-1 sm:col-span-2">
             <label className="text-xs text-foreground/45">Platform</label>
-            <select
-              name="platform"
-              defaultValue={link.platform}
-              className="h-8 w-full rounded-lg border border-input bg-transparent px-2 text-sm"
-            >
-              {PLATFORMS.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
+            <Select name="platform" defaultValue={link.platform}>
+              <SelectTrigger className="h-8 w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PLATFORMS.map((p) => (
+                  <SelectItem key={p} value={p}>
+                    {p}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="col-span-2 space-y-1 sm:col-span-4">
             <label className="text-xs text-foreground/45">URL</label>
@@ -67,13 +69,18 @@ export function SocialLinksManager({ links }: { links: SocialLink[] }) {
       >
         <div className="space-y-1 sm:col-span-2">
           <label className="text-xs text-foreground/45">Platform</label>
-          <select name="platform" defaultValue="INSTAGRAM" className="h-8 w-full rounded-lg border border-input bg-transparent px-2 text-sm">
-            {PLATFORMS.map((p) => (
-              <option key={p} value={p}>
-                {p}
-              </option>
-            ))}
-          </select>
+          <Select name="platform" defaultValue="INSTAGRAM">
+            <SelectTrigger className="h-8 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {PLATFORMS.map((p) => (
+                <SelectItem key={p} value={p}>
+                  {p}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="col-span-2 space-y-1 sm:col-span-4">
           <label className="text-xs text-foreground/45">URL</label>

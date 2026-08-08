@@ -82,8 +82,8 @@ export function AdminSidebar({ role }: { role: Role }) {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r border-white/10 bg-[#080808] lg:flex">
-      <div className="flex h-16 items-center gap-2 border-b border-white/10 px-6">
+    <aside className="hidden h-full w-64 shrink-0 flex-col border-r border-white/10 bg-[#080808] lg:flex">
+      <div className="flex h-16 shrink-0 items-center gap-2 border-b border-white/10 px-6">
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-black">
           <Dumbbell className="h-4 w-4" strokeWidth={2.5} />
         </span>

@@ -13,7 +13,7 @@ export default function AdminNotFound() {
       </p>
       <Link
         href="/admin"
-        className="mt-6 inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-bold uppercase tracking-wider text-black transition-transform hover:scale-[1.03]"
+        className="mt-6 inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-black transition-transform hover:scale-[1.03]"
       >
         Back to Dashboard
         <ArrowRight className="h-4 w-4" />

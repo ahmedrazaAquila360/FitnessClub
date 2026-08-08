@@ -46,7 +46,7 @@ export function LoginForm() {
         type="submit"
         disabled={isPending}
         size="lg"
-        className="w-full gap-2 rounded-full bg-brand font-bold uppercase tracking-wider text-black hover:bg-brand/90"
+        className="w-full gap-2 rounded-full bg-brand font-semibold text-black hover:bg-brand/90"
       >
         {isPending ? "Signing in..." : "Sign In"}
         <ArrowRight className="h-4 w-4" />

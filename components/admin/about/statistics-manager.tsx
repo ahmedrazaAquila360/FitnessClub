@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash2, Plus } from "lucide-react";
 import { createStatistic, updateStatistic, deleteStatistic } from "@/lib/actions/statistics";
 import { ICON_NAMES } from "@/lib/icon-map";
@@ -31,17 +32,18 @@ export function StatisticsManager({ statistics }: { statistics: Statistic[] }) {
           </div>
           <div className="space-y-1">
             <label className="text-xs text-foreground/45">Icon</label>
-            <select
-              name="icon"
-              defaultValue={stat.icon}
-              className="h-8 w-full rounded-lg border border-input bg-transparent px-2 text-sm"
-            >
-              {ICON_NAMES.map((icon) => (
-                <option key={icon} value={icon}>
-                  {icon}
-                </option>
-              ))}
-            </select>
+            <Select name="icon" defaultValue={stat.icon}>
+              <SelectTrigger className="h-8 w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ICON_NAMES.map((icon) => (
+                  <SelectItem key={icon} value={icon}>
+                    {icon}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <input type="hidden" name="order" value={stat.order} />
           <input type="hidden" name="isActive" value="true" />
@@ -83,13 +85,18 @@ export function StatisticsManager({ statistics }: { statistics: Statistic[] }) {
         </div>
         <div className="space-y-1">
           <label className="text-xs text-foreground/45">Icon</label>
-          <select name="icon" defaultValue="Users" className="h-8 w-full rounded-lg border border-input bg-transparent px-2 text-sm">
-            {ICON_NAMES.map((icon) => (
-              <option key={icon} value={icon}>
-                {icon}
-              </option>
-            ))}
-          </select>
+          <Select name="icon" defaultValue="Users">
+            <SelectTrigger className="h-8 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {ICON_NAMES.map((icon) => (
+                <SelectItem key={icon} value={icon}>
+                  {icon}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <input type="hidden" name="order" value={statistics.length} />
         <input type="hidden" name="isActive" value="true" />
