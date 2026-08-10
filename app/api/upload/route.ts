@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
+import { put } from "@vercel/blob";
 import path from "path";
 import { getSession } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
@@ -45,11 +45,13 @@ export async function POST(request: Request) {
     .replace(/[^a-z0-9-_]/gi, "-")
     .slice(0, 60);
   const filename = `${Date.now()}-${safeBase}${ext}`;
-  const uploadDir = path.join(process.cwd(), "public", "uploads", folder);
-  await mkdir(uploadDir, { recursive: true });
-  await writeFile(path.join(uploadDir, filename), bytes);
 
-  const url = `/uploads/${folder}/${filename}`;
+  const blob = await put(`${folder}/${filename}`, bytes, {
+    access: "public",
+    contentType: file.type,
+  });
+
+  const url = blob.url;
   const asset = await prisma.mediaAsset.create({
     data: {
       url,

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireRole, ALL_ROLES } from "@/lib/auth/guards";
 import { logActivity } from "@/lib/actions/activity";
 import { revalidatePath } from "next/cache";
+import { del } from "@vercel/blob";
 import { unlink } from "fs/promises";
 import path from "path";
 
@@ -12,7 +13,10 @@ export async function deleteMediaAsset(id: string) {
   const asset = await prisma.mediaAsset.delete({ where: { id } });
   try {
     if (asset.url.startsWith("/uploads/")) {
+      // Legacy local-filesystem uploads from before the Blob storage migration.
       await unlink(path.join(process.cwd(), "public", asset.url));
+    } else if (asset.url.includes(".blob.vercel-storage.com/")) {
+      await del(asset.url);
     }
   } catch {
     // File may already be gone; the DB record is the source of truth.
