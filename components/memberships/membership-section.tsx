@@ -3,7 +3,7 @@ import { MembershipGrid } from "@/components/memberships/membership-grid";
 
 export function MembershipSection() {
   return (
-    <section id="memberships" className="relative bg-[#080808] py-28 sm:py-36">
+    <section id="memberships" className="relative overflow-hidden bg-[#080808] py-28 sm:py-36">
       <div className="pointer-events-none absolute left-1/2 top-0 h-[400px] w-[900px] -translate-x-1/2 rounded-full bg-brand/5 blur-[140px]" />
       <div className="relative mx-auto max-w-7xl px-6 sm:px-8">
         <div className="mx-auto mb-16 max-w-2xl text-center">
