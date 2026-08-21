@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import ThemeStyleInjector from "@/components/layout/theme-style-injector";
 import { NavigationProgress } from "@/components/layout/navigation-progress";
+import { SmoothScrollProvider } from "@/components/layout/smooth-scroll-provider";
 import { getSEOSettings, getGymSettings } from "@/lib/data/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -47,7 +48,9 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <NavigationProgress />
         </Suspense>
-        <TooltipProvider delay={150}>{children}</TooltipProvider>
+        <SmoothScrollProvider>
+          <TooltipProvider delay={150}>{children}</TooltipProvider>
+        </SmoothScrollProvider>
         <Toaster theme="dark" position="bottom-right" richColors />
       </body>
     </html>
