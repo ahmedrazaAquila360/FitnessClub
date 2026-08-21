@@ -1,14 +1,16 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, ChevronDown, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Counter } from "@/components/animations/counter";
+import { useScrollScrubVideo } from "@/lib/hooks/use-scroll-scrub-video";
 import type { HeroSection, Statistic } from "@prisma/client";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+const SCRUB_VIDEO_SRC = "/videos/hero-scrub.mp4";
 
 const alignmentClasses: Record<string, string> = {
   LEFT: "items-start text-left",
@@ -28,6 +30,13 @@ export function HeroContent({
   const isSlideLeft = hero.animationType === "SLIDE_LEFT";
   const isFadeIn = hero.animationType === "FADE_IN";
 
+  const sectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const fadeRef = useRef<HTMLDivElement>(null);
+  useScrollScrubVideo({ sectionRef, videoRef, fadeRef });
+
+  const videoSrc = hero.backgroundVideo || SCRUB_VIDEO_SRC;
+
   const headingInitial = isZoom
     ? { opacity: 0, scale: 0.85 }
     : isSlideLeft
@@ -37,7 +46,10 @@ export function HeroContent({
         : { opacity: 0, y: 40 };
 
   return (
-    <section className="relative flex min-h-[100svh] w-full items-center overflow-hidden bg-black">
+    <section
+      ref={sectionRef}
+      className="relative flex min-h-[100svh] w-full items-center overflow-hidden bg-black"
+    >
       {/* Background */}
       <motion.div
         className="absolute inset-0"
@@ -45,32 +57,15 @@ export function HeroContent({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.6, ease: EASE }}
       >
-        {hero.backgroundVideo ? (
-          <video
-            className="h-full w-full object-cover"
-            src={hero.backgroundVideo}
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster={hero.backgroundImage}
-          />
-        ) : (
-          <motion.div
-            className="relative h-full w-full"
-            animate={{ scale: [1, 1.08] }}
-            transition={{ duration: 22, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
-          >
-            <Image
-              src={hero.backgroundImage}
-              alt=""
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-            />
-          </motion.div>
-        )}
+        <video
+          ref={videoRef}
+          className="h-full w-full object-cover"
+          src={videoSrc}
+          muted
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+        />
         <div
           className="absolute inset-0 bg-black"
           style={{ opacity: hero.overlayOpacity }}
@@ -84,7 +79,7 @@ export function HeroContent({
       <div className="pointer-events-none absolute -left-32 top-1/4 h-96 w-96 rounded-full bg-brand/20 blur-[120px]" />
       <div className="pointer-events-none absolute -right-20 bottom-0 h-80 w-80 rounded-full bg-brand-accent/10 blur-[120px]" />
 
-      <div className="relative mx-auto flex w-full max-w-7xl flex-col px-6 pt-28 sm:px-8 lg:pt-24">
+      <div ref={fadeRef} className="relative mx-auto flex h-full w-full max-w-7xl flex-col px-6 pt-28 sm:px-8 lg:pt-24">
         <div className={cn("flex max-w-3xl flex-col gap-6", align)}>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -168,22 +163,22 @@ export function HeroContent({
             </div>
           </motion.div>
         )}
-      </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.6, duration: 0.8 }}
-        className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-foreground/50"
-      >
-        <span className="text-[10px] uppercase tracking-[0.3em]">Scroll</span>
         <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.6, duration: 0.8 }}
+          className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-foreground/50"
         >
-          <ChevronDown className="h-4 w-4" />
+          <span className="text-[10px] uppercase tracking-[0.3em]">Scroll</span>
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <ChevronDown className="h-4 w-4" />
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
     </section>
   );
 }
