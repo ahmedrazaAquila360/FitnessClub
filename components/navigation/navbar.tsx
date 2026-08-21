@@ -69,7 +69,9 @@ export function Navbar({
         <div
           className={cn(
             "mx-auto flex max-w-7xl items-center justify-between rounded-full px-4 transition-all duration-500 sm:px-6",
-            scrolled ? "glass mx-4 shadow-2xl shadow-black/40 sm:mx-8" : "bg-transparent"
+            scrolled
+              ? "glass w-[calc(100%-2rem)] shadow-2xl shadow-black/40 sm:w-[calc(100%-4rem)]"
+              : "bg-transparent"
           )}
         >
           <Link

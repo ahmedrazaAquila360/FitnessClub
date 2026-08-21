@@ -125,10 +125,13 @@
   html {
     @apply font-sans scroll-smooth;
     color-scheme: dark;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
   }
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "ss01" 1, "cv01" 1;
+    overflow-x: hidden;
   }
   ::selection {
     background: var(--brand-primary);

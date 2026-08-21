@@ -69,6 +69,7 @@ export function useScrollScrubVideo({
           start: "top top",
           end: isMobile ? mobileEnd : end,
           pin: true,
+          pinType: "transform",
           scrub: 1,
           anticipatePin: 1,
           onUpdate: (self) => {
