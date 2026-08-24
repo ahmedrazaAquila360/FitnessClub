@@ -23,7 +23,7 @@ function readForm(formData: FormData) {
     location: formData.get("location"),
     order: formData.get("order"),
     isExternal: formData.get("isExternal") === "true",
-    isActive: formData.get("isActive") === "true",
+    isActive: formData.has("isActive"),
   });
 }
 

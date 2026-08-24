@@ -14,7 +14,7 @@ function readForm(formData: FormData) {
     suffix: formData.get("suffix") || "",
     icon: formData.get("icon") || "Users",
     order: formData.get("order"),
-    isActive: formData.get("isActive") === "true",
+    isActive: formData.has("isActive"),
   });
 }
 

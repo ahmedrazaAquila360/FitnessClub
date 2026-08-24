@@ -20,7 +20,7 @@ export function AdminTopbar({ name, role }: { name: string; role: Role }) {
           <SheetTrigger render={<Button variant="ghost" size="icon" className="lg:hidden" />}>
             <Menu className="h-5 w-5" />
           </SheetTrigger>
-          <SheetContent side="left" className="w-72 border-white/10 bg-[#080808] p-0">
+          <SheetContent side="left" showCloseButton={false} className="w-72 border-white/10 bg-[#080808] p-0">
             <SheetTitle className="sr-only">Admin navigation</SheetTitle>
             <AdminMobileNav role={role} onNavigate={() => setOpen(false)} />
           </SheetContent>

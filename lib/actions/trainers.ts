@@ -24,7 +24,7 @@ function readForm(formData: FormData) {
     youtube: formData.get("youtube") || null,
     isFeatured: formData.get("isFeatured") === "true",
     order: formData.get("order"),
-    isActive: formData.get("isActive") === "true",
+    isActive: formData.has("isActive"),
   });
 }
 

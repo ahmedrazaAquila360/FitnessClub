@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -24,6 +25,8 @@ import {
   Info,
   Wand2,
   MegaphoneIcon,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Role } from "@prisma/client";
@@ -78,52 +81,103 @@ export const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
+const COLLAPSE_STORAGE_KEY = "admin-sidebar-collapsed";
+
 export function AdminSidebar({ role }: { role: Role }) {
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    // localStorage isn't readable during SSR, so this can't be a lazy
+    // useState initializer without desyncing from the server-rendered
+    // markup — read it once here instead, right after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (localStorage.getItem(COLLAPSE_STORAGE_KEY) === "1") setCollapsed(true);
+  }, []);
+
+  function toggleCollapsed() {
+    setCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem(COLLAPSE_STORAGE_KEY, next ? "1" : "0");
+      return next;
+    });
+  }
 
   return (
-    <aside className="hidden h-full w-64 shrink-0 flex-col border-r border-white/10 bg-[#080808] lg:flex">
-      <div className="flex h-16 shrink-0 items-center gap-2 border-b border-white/10 px-6">
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-black">
-          <Dumbbell className="h-4 w-4" strokeWidth={2.5} />
-        </span>
-        <span className="heading-font text-sm tracking-wide">APEX ADMIN</span>
-      </div>
-      <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-6">
-        {NAV_GROUPS.map((group) => {
-          const items = group.items.filter((item) => !item.roles || item.roles.includes(role));
-          if (items.length === 0) return null;
-          return (
-            <div key={group.label}>
-              <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-foreground/35">
-                {group.label}
-              </p>
-              <div className="space-y-0.5">
-                {items.map((item) => {
-                  const isActive =
-                    item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={cn(
-                        "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
-                        isActive
-                          ? "bg-brand/15 text-brand"
-                          : "text-foreground/60 hover:bg-white/5 hover:text-foreground"
-                      )}
-                    >
-                      <Icon className="h-4 w-4 shrink-0" />
-                      {item.label}
-                    </Link>
-                  );
-                })}
+    <div className="relative hidden shrink-0 lg:block">
+      <aside
+        className={cn(
+          "flex h-full flex-col border-r border-white/10 bg-[#080808] transition-[width] duration-200 ease-out",
+          collapsed ? "w-16" : "w-64"
+        )}
+      >
+        <div
+          className={cn(
+            "flex h-16 shrink-0 items-center gap-2 border-b border-white/10",
+            collapsed ? "justify-center px-2" : "px-6"
+          )}
+        >
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand text-black">
+            <Dumbbell className="h-4 w-4" strokeWidth={2.5} />
+          </span>
+          {!collapsed && <span className="heading-font text-sm tracking-wide">APEX ADMIN</span>}
+        </div>
+        <nav className={cn("flex-1 space-y-6 overflow-y-auto py-6", collapsed ? "px-2" : "px-3")}>
+          {NAV_GROUPS.map((group) => {
+            const items = group.items.filter((item) => !item.roles || item.roles.includes(role));
+            if (items.length === 0) return null;
+            return (
+              <div key={group.label}>
+                {!collapsed && (
+                  <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-foreground/35">
+                    {group.label}
+                  </p>
+                )}
+                <div className="space-y-0.5">
+                  {items.map((item) => {
+                    const isActive =
+                      item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        title={collapsed ? item.label : undefined}
+                        className={cn(
+                          "group relative flex items-center gap-2.5 rounded-lg py-2 text-sm transition-all duration-150",
+                          collapsed ? "justify-center px-2" : "px-3",
+                          isActive
+                            ? "bg-brand/15 text-brand"
+                            : "text-foreground/60 hover:bg-white/5 hover:text-foreground",
+                          !collapsed && !isActive && "hover:translate-x-0.5"
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-brand transition-opacity duration-150",
+                            isActive ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        <Icon className="h-4 w-4 shrink-0" />
+                        {!collapsed && item.label}
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </nav>
-    </aside>
+            );
+          })}
+        </nav>
+      </aside>
+
+      <button
+        type="button"
+        onClick={toggleCollapsed}
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        className="absolute -right-3 top-6 z-40 flex h-6 w-6 items-center justify-center rounded-full border border-white/10 bg-[#080808] text-foreground/60 shadow-sm transition-colors hover:text-foreground"
+      >
+        {collapsed ? <PanelLeftOpen className="h-3.5 w-3.5" /> : <PanelLeftClose className="h-3.5 w-3.5" />}
+      </button>
+    </div>
   );
 }

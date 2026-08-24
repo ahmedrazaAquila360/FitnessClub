@@ -15,7 +15,7 @@ function readForm(formData: FormData) {
     altText: formData.get("altText") || "",
     isFeatured: formData.get("isFeatured") === "true",
     order: formData.get("order"),
-    isActive: formData.get("isActive") === "true",
+    isActive: formData.has("isActive"),
   });
 }
 

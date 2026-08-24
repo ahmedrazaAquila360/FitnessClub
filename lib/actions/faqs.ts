@@ -13,7 +13,7 @@ function readForm(formData: FormData) {
     answer: formData.get("answer"),
     category: formData.get("category") || "General",
     order: formData.get("order"),
-    isActive: formData.get("isActive") === "true",
+    isActive: formData.has("isActive"),
   });
 }
 

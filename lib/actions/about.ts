@@ -45,7 +45,7 @@ export async function updateAbout(_prev: ActionResult, formData: FormData): Prom
     missionTitle: formData.get("missionTitle"),
     missionText: formData.get("missionText"),
     values,
-    isActive: formData.get("isActive") === "true",
+    isActive: formData.has("isActive"),
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message };
 
