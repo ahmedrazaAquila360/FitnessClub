@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, ChevronDown, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -33,7 +34,7 @@ export function HeroContent({
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const fadeRef = useRef<HTMLDivElement>(null);
-  useScrollScrubVideo({ sectionRef, videoRef, fadeRef });
+  const { showVideo } = useScrollScrubVideo({ sectionRef, videoRef, fadeRef });
 
   const videoSrc = hero.backgroundVideo || SCRUB_VIDEO_SRC;
 
@@ -57,15 +58,26 @@ export function HeroContent({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.6, ease: EASE }}
       >
-        <video
-          ref={videoRef}
-          className="h-full w-full object-cover"
-          src={videoSrc}
-          muted
-          playsInline
-          preload="auto"
-          aria-hidden="true"
-        />
+        {showVideo ? (
+          <video
+            ref={videoRef}
+            className="h-full w-full object-cover"
+            src={videoSrc}
+            muted
+            playsInline
+            preload="auto"
+            aria-hidden="true"
+          />
+        ) : (
+          <Image
+            src={hero.backgroundImage}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        )}
         <div
           className="absolute inset-0 bg-black"
           style={{ opacity: hero.overlayOpacity }}
