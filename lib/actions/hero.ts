@@ -44,7 +44,7 @@ export async function updateHero(_prev: ActionResult, formData: FormData): Promi
     overlayOpacity: formData.get("overlayOpacity"),
     textAlign: formData.get("textAlign"),
     animationType: formData.get("animationType"),
-    isActive: formData.get("isActive") === "true",
+    isActive: formData.has("isActive"),
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message };
   const data = { ...parsed.data, backgroundVideo: parsed.data.backgroundVideo || null };

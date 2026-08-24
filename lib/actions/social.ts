@@ -19,7 +19,7 @@ function readForm(formData: FormData) {
     platform: formData.get("platform"),
     url: formData.get("url"),
     order: formData.get("order"),
-    isActive: formData.get("isActive") === "true",
+    isActive: formData.has("isActive"),
   });
 }
 

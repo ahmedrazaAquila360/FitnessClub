@@ -20,7 +20,7 @@ function readForm(formData: FormData) {
     badge: formData.get("badge") || null,
     isFeatured: formData.get("isFeatured") === "true",
     order: formData.get("order"),
-    isActive: formData.get("isActive") === "true",
+    isActive: formData.has("isActive"),
   });
 }
 

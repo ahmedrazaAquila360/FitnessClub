@@ -32,7 +32,7 @@ export async function updateCTA(_prev: ActionResult, formData: FormData): Promis
     secondaryCtaLabel: formData.get("secondaryCtaLabel"),
     secondaryCtaHref: formData.get("secondaryCtaHref"),
     backgroundImage: formData.get("backgroundImage"),
-    isActive: formData.get("isActive") === "true",
+    isActive: formData.has("isActive"),
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message };
   await prisma.cTASection.upsert({

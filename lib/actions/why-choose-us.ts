@@ -14,7 +14,7 @@ function readForm(formData: FormData) {
     icon: formData.get("icon"),
     image: formData.get("image") || null,
     order: formData.get("order"),
-    isActive: formData.get("isActive") === "true",
+    isActive: formData.has("isActive"),
   });
 }
 

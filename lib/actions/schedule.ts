@@ -19,7 +19,7 @@ function readForm(formData: FormData) {
     difficulty: formData.get("difficulty"),
     capacity: formData.get("capacity"),
     booked: formData.get("booked"),
-    isActive: formData.get("isActive") === "true",
+    isActive: formData.has("isActive"),
   });
 }
 
