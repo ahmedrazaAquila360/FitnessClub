@@ -11,7 +11,6 @@ type UseScrollScrubVideoOptions = {
   videoRef: RefObject<HTMLVideoElement | null>;
   fadeRef: RefObject<HTMLElement | null>;
   end?: string;
-  mobileEnd?: string;
   textFadeEnd?: number;
   smoothing?: number;
   threshold?: number;
@@ -23,27 +22,32 @@ type UseScrollScrubVideoOptions = {
  * targetTime/renderedTime render loop instead of seeking on every raw
  * ScrollTrigger update, since this asset only has ~1 keyframe/0.25s and
  * naive seeking on every tick stutters badly.
+ *
+ * Mobile and reduced-motion never mount the video at all (see `showVideo`) —
+ * scroll-driven seeking is heavy enough to hang low-powered phones, so those
+ * get a plain static background image instead.
  */
 export function useScrollScrubVideo({
   sectionRef,
   videoRef,
   fadeRef,
   end = "+=2200",
-  mobileEnd = "+=1300",
   textFadeEnd = 0.22,
   smoothing = 0.12,
   threshold = 0.01,
 }: UseScrollScrubVideoOptions) {
-  const [reduced, setReduced] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
 
   useEffect(() => {
-    setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setShowVideo(!isMobile && !prefersReducedMotion);
   }, []);
 
   useEffect(() => {
     const section = sectionRef.current;
     const video = videoRef.current;
-    if (!section || !video || reduced) return;
+    if (!section || !video || !showVideo) return;
 
     let duration = 0;
     let targetTime = 0;
@@ -60,14 +64,12 @@ export function useScrollScrubVideo({
       video.addEventListener("loadedmetadata", initDuration, { once: true });
     }
 
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
-
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          end: isMobile ? mobileEnd : end,
+          end,
           pin: true,
           pinType: "transform",
           scrub: 1,
@@ -101,7 +103,7 @@ export function useScrollScrubVideo({
       video.removeEventListener("loadedmetadata", initDuration);
       ctx.revert();
     };
-  }, [sectionRef, videoRef, fadeRef, end, mobileEnd, textFadeEnd, smoothing, threshold, reduced]);
+  }, [sectionRef, videoRef, fadeRef, end, textFadeEnd, smoothing, threshold, showVideo]);
 
-  return { reduced };
+  return { showVideo };
 }
