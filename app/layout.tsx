@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { default: seo.defaultTitle, template: seo.titleTemplate },
     description: seo.defaultDescription,
     keywords: seo.keywords.split(",").map((k) => k.trim()),
-    icons: gym.faviconUrl ? [{ url: gym.faviconUrl }] : undefined,
+    icons: [{ url: gym.faviconUrl || "/default-favicon.ico" }],
     robots: { index: seo.robotsIndex, follow: seo.robotsFollow },
     openGraph: {
       title: seo.defaultTitle,
