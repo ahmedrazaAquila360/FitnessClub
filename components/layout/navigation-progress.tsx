@@ -32,6 +32,12 @@ export function NavigationProgress() {
       if (href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) return;
       if (/^https?:\/\//.test(href) && !href.startsWith(window.location.origin)) return;
 
+      // Same-page links (e.g. "/#about" while already on "/") never change the
+      // pathname or search params, so nothing would ever hide the bar — it
+      // would spin until the timeout and look like a failed navigation.
+      const target = new URL(href, window.location.href);
+      if (target.pathname === window.location.pathname && target.search === window.location.search) return;
+
       setVisible(true);
       clearTimeout(hideTimeout.current);
       hideTimeout.current = setTimeout(() => setVisible(false), 5000);
