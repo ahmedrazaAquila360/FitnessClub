@@ -161,7 +161,7 @@ async function main() {
   // ---------------------------------------------------------------------
   const headerNav = [
     { label: "Home", href: "/" },
-    { label: "About", href: "/#about" },
+    { label: "About", href: "/about" },
     { label: "Programs", href: "/programs" },
     { label: "Membership", href: "/membership" },
     { label: "Trainers", href: "/trainers" },
