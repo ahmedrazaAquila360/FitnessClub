@@ -33,11 +33,22 @@ export async function getFooterSettings() {
   return prisma.footerSettings.create({ data: { id: SINGLETON_ID } });
 }
 
+// About now lives at its own /about page. Rows saved before that change still
+// point at the homepage anchor, so map them to the page at read time.
+const LEGACY_NAV_HREFS: Record<string, string> = {
+  "#about": "/about",
+  "/#about": "/about",
+};
+
 export async function getNavigation(location: "HEADER" | "FOOTER") {
-  return prisma.navigationItem.findMany({
+  const items = await prisma.navigationItem.findMany({
     where: { location, isActive: true },
     orderBy: { order: "asc" },
   });
+  return items.map((item) => ({
+    ...item,
+    href: LEGACY_NAV_HREFS[item.href] ?? item.href,
+  }));
 }
 
 export async function getSocialLinks() {
